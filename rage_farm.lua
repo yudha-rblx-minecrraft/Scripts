@@ -432,6 +432,190 @@ task.spawn(function()
             end
             
         end
+-- ==========================================
+-- BAGIAN 3: TITAN ENGINE (AUTOFARM FIXED 0.5s DELAY)
+-- ==========================================
+
+local function getTgt()
+    local s = string.lower(string.gsub(cfg.Tgt, "^%s*(.-)%s*$", "%1"))
+    if s == "" then return nil end
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= LP and (string.lower(p.Name):find(s, 1, true) or string.lower(p.DisplayName):find(s, 1, true)) then return p end
+    end
+end
+
+local function fireProx(prompt)
+    if prompt and prompt.Enabled then
+        prompt.HoldDuration = 0
+        prompt.MaxActivationDistance = 9e9
+        pcall(function() fireproximityprompt(prompt) end)
+    end
+end
+
+local orbAng = 0
+RunService.Heartbeat:Connect(function()
+    local c = LP.Character
+    local hrp = c and c:FindFirstChild("HumanoidRootPart")
+    local hum = c and c:FindFirstChildWhichIsA("Humanoid")
+
+    if not hrp then return end
+
+    if State.GoTo then
+        local t = getTgt()
+        if t and t.Character and t.Character:FindFirstChild("HumanoidRootPart") then
+            hrp.CFrame = t.Character.HumanoidRootPart.CFrame * CFrame.new(0, cfg.Off, 0)
+            hrp.AssemblyLinearVelocity = Vector3.zero
+        end
+    elseif State.Orbit then
+        local t = getTgt()
+        if t and t.Character and t.Character:FindFirstChild("HumanoidRootPart") then
+            orbAng = orbAng + (State.Fling and 2.5 or 0.15)
+            local pos = t.Character.HumanoidRootPart.Position + Vector3.new(math.cos(orbAng) * 6, cfg.Off, math.sin(orbAng) * 6)
+            hrp.CFrame = CFrame.new(pos, t.Character.HumanoidRootPart.Position)
+            hrp.AssemblyLinearVelocity = State.Fling and Vector3.new(50000, 50000, 50000) or Vector3.zero
+        end
+    end
+
+    if hum then
+        if State.Fly then
+            hum.Sit = false
+            if hum:GetState() ~= Enum.HumanoidStateType.Running then hum:ChangeState(Enum.HumanoidStateType.Running) end
+            local mv = hum.MoveVector
+            hrp.AssemblyLinearVelocity = mv.Magnitude > 0 and (Workspace.CurrentCamera.CFrame:VectorToWorldSpace(Vector3.new(mv.X, 0, mv.Z))).Unit * cfg.FS or Vector3.zero
+        elseif not State.Fly then 
+            hum.WalkSpeed, hum.UseJumpPower, hum.JumpPower = cfg.WS, true, cfg.JP 
+        end
+    end
+
+    if State.Freeze then
+        hrp.AssemblyLinearVelocity, hrp.AssemblyAngularVelocity = Vector3.zero, Vector3.zero
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+        if State.Fullbright then
+            Lighting.Brightness = 2
+            Lighting.ClockTime = 14
+            Lighting.GlobalShadows = false
+        end
+        if State.NoFog then Lighting.FogEnd = 100000 end
+    end
+end)
+
+RunService.Stepped:Connect(function()
+    local c = LP.Character
+    if not c then return end
+    
+    if State.GodMode then
+        local hum = c:FindFirstChildWhichIsA("Humanoid")
+        if hum then
+            hum.Health = hum.MaxHealth
+            hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+        end
+        for _, p in ipairs(c:GetChildren()) do if p:IsA("BasePart") then p.CanTouch = false end end
+    else
+        for _, p in ipairs(c:GetChildren()) do if p:IsA("BasePart") then p.CanTouch = true end end
+    end
+
+    if State.Noclip then
+        for _, p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide = false end end
+    end
+end)
+
+-- FIXED AUTOFARM (DELAY 0.5s AGAR TIDAK BUG)
+task.spawn(function()
+    while true do
+        task.wait(0.5) -- Delay disesuaikan jadi 0.5 detik
+        local c = LP.Character
+        local hrp = c and c:FindFirstChild("HumanoidRootPart")
+        local storages = Workspace:FindFirstChild("Storages")
+
+        if hrp and storages then
+            if State.AutoFarm then
+                for _, st in ipairs(storages:GetChildren()) do
+                    if not State.AutoFarm then break end
+                    
+                    local room = st:FindFirstChild("Room") or (st.Name == "Room" and st)
+                    if room then
+                        local door = room:FindFirstChild("Door")
+                        local prompt = door and door:FindFirstChildWhichIsA("ProximityPrompt", true)
+                        local doorRoot = door and (door:IsA("BasePart") and door or door:FindFirstChildWhichIsA("BasePart", true))
+                        if doorRoot and prompt and prompt.Enabled then
+                            hrp.CFrame = doorRoot.CFrame + Vector3.new(0, 3, 0)
+                            hrp.AssemblyLinearVelocity = Vector3.zero
+                            fireProx(prompt)
+                            task.wait(0.3) -- Jeda agar pintu terbuka sempurna
+                        end
+                    end
+                    
+                    local contents = st:FindFirstChild("Contents")
+                    local lootFolder = contents and contents:FindFirstChild("Loot")
+                    if lootFolder then
+                        for _, loot in ipairs(lootFolder:GetChildren()) do
+                            if not State.AutoFarm then break end
+                            local prompt = loot:FindFirstChildWhichIsA("ProximityPrompt", true)
+                            local lootRoot = loot:IsA("BasePart") and loot or loot:FindFirstChildWhichIsA("BasePart", true)
+                            if lootRoot and prompt and prompt.Enabled then
+                                hrp.CFrame = lootRoot.CFrame + Vector3.new(0, 1.5, 0)
+                                hrp.AssemblyLinearVelocity = Vector3.zero
+                                fireProx(prompt)
+                                task.wait(0.2) 
+                            end
+                        end
+                    end
+                end
+            end
+            
+            if State.Magnet then
+                local originCF = hrp.CFrame
+                local collected = false
+                
+                for _, st in ipairs(storages:GetChildren()) do
+                    local lootFolder = st:FindFirstChild("Contents") and st.Contents:FindFirstChild("Loot")
+                    if lootFolder then
+                        for _, loot in ipairs(lootFolder:GetChildren()) do
+                            local part = loot:IsA("BasePart") and loot or loot:FindFirstChildWhichIsA("BasePart", true)
+                            local prompt = loot:FindFirstChildWhichIsA("ProximityPrompt", true)
+                            
+                            if part and prompt and prompt.Enabled and (part.Position - originCF.Position).Magnitude <= cfg.MagnetRadius then
+                                hrp.CFrame = part.CFrame + Vector3.new(0, 1.5, 0)
+                                hrp.AssemblyLinearVelocity = Vector3.zero
+                                fireProx(prompt)
+                                collected = true
+                                task.wait(0.2)
+                            end
+                        end
+                    end
+                end
+                
+                if collected then
+                    hrp.CFrame = originCF
+                    hrp.AssemblyLinearVelocity = Vector3.zero
+                end
+            end
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        local hrp = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+        if State.AutoInteract and hrp then
+            local storages = Workspace:FindFirstChild("Storages")
+            if storages then
+                for _, prompt in ipairs(storages:GetDescendants()) do
+                    if prompt:IsA("ProximityPrompt") and prompt.Enabled then
+                        local part = prompt.Parent
+                        if part and part:IsA("BasePart") and (part.Position - hrp.Position).Magnitude <= 15 then
+                            fireProx(prompt)
+                        end
+                    end
+                end
+            end
+        end
     end
 end)
 
@@ -462,7 +646,7 @@ end)
 local espCache = {}
 task.spawn(function()
     while true do
-        task.wait(1)
+        task.wait(1.5)
         if State.ESP then
             local function addESP(obj, color)
                 if not obj then return end
@@ -483,4 +667,5 @@ task.spawn(function()
     end
 end)
 
-SendNotification("Titan Hub Injected!", "Welcome back, Yudha. Dominate the game.", 5)
+SendNotification("Titan Hub Injected!", "AutoFarm delay adjusted to 0.5s.", 5)
+            
