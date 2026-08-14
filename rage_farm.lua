@@ -1,6 +1,7 @@
 -- ==========================================
--- Script Name: Titan Hub (V13 - AESTHETIC PURPLE EDITION)
--- Created by: Yudha and Helper: Gemini ai
+-- Script Name: TITAN HUB V14 - FIXED & STABLE EDITION
+-- Created by: Yudha & Gemini AI
+-- BAGIAN 1: SETUP & UI INTERFACE
 -- ==========================================
 
 local CoreGui = game:GetService("CoreGui")
@@ -13,20 +14,20 @@ local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 
 local LP = Players.LocalPlayer
-local guiName = "YudhaTitanHub_V13"
-local cfgFile = "TitanHub_Cfg_V13.json"
+local guiName = "TitanHub_V14_Fixed"
+local cfgFile = "TitanHub_Cfg_V14.json"
 
 pcall(function() 
     if LP.PlayerGui:FindFirstChild(guiName) then LP.PlayerGui[guiName]:Destroy() end 
     if CoreGui:FindFirstChild(guiName) then CoreGui[guiName]:Destroy() end 
 end)
 
-local cfg = { Tgt = "", ChatMsg = "Yudha Hub is OP!", FS = 75, WS = 16, JP = 50, Off = 0, MagnetRadius = 30, FarmDelay = 1.5 }
+local cfg = { Tgt = "", ChatMsg = "Titan Hub is OP!", FS = 75, WS = 16, JP = 50, Off = 0, MagnetRadius = 30, FarmDelay = 1.5 }
 local State = { 
-    AutoFarm = false, Magnet = false, AutoInteract = false,
-    Fly = false, InfJ = false, Noclip = false, ClickTP = false,
-    GodMode = false, Invis = false, GoTo = false, Orbit = false, Fling = false, Freeze = false,
-    ESP = false, Fullbright = false, NoFog = false, AntiAFK = true, ChatSpam = false 
+    AutoFarm = false, Magnet = false, AutoInteract = false, Fly = false, InfJ = false, 
+    Noclip = false, ClickTP = false, GodMode = false, Invis = false, GoTo = false, 
+    Orbit = false, Fling = false, Freeze = false, ESP = false, Fullbright = false, 
+    NoFog = false, AntiAFK = true, ChatSpam = false 
 }
 
 pcall(function() 
@@ -37,24 +38,21 @@ pcall(function()
 end)
 local function saveCfg() pcall(function() if writefile then writefile(cfgFile, HttpService:JSONEncode(cfg)) end end) end
 
--- THEME COLORS (PURPLE AESTHETIC)
 local Colors = {
     MainBg = Color3.fromRGB(15, 15, 20),
     SideBg = Color3.fromRGB(22, 22, 28),
     SectionBg = Color3.fromRGB(28, 28, 35),
-    Accent = Color3.fromRGB(138, 43, 226), -- Purple
+    Accent = Color3.fromRGB(138, 43, 226),
     TextMain = Color3.fromRGB(255, 255, 255),
     TextDark = Color3.fromRGB(150, 150, 160)
 }
 
--- ROOT GUI
 local SG = Instance.new("ScreenGui")
 SG.Name = guiName
 SG.ResetOnSpawn = false
-local parentSuccess = pcall(function() SG.Parent = CoreGui end)
-if not parentSuccess or not SG.Parent then SG.Parent = LP:WaitForChild("PlayerGui") end
+pcall(function() SG.Parent = CoreGui end)
+if not SG.Parent then SG.Parent = LP:WaitForChild("PlayerGui") end
 
--- MAIN WINDOW
 local Main = Instance.new("Frame", SG)
 Main.Size, Main.Position, Main.BackgroundColor3 = UDim2.new(0, 600, 0, 420), UDim2.new(0.5, -300, 0.5, -210), Colors.MainBg
 Main.Active, Main.Draggable, Main.ClipsDescendants = true, true, true
@@ -62,38 +60,30 @@ Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
 Instance.new("UIStroke", Main).Color = Colors.Accent
 Instance.new("UIStroke", Main).Thickness = 1.5
 
--- TOP BAR
 local TopBar = Instance.new("Frame", Main)
 TopBar.Size, TopBar.BackgroundColor3 = UDim2.new(1, 0, 0, 45), Colors.SideBg
 Instance.new("UICorner", TopBar).CornerRadius = UDim.new(0, 12)
 
 local Title = Instance.new("TextLabel", TopBar)
-Title.Size, Title.Position, Title.BackgroundTransparency = UDim2.new(0, 200, 1, 0), UDim2.new(0, 20, 0, 0), 1
-Title.Text, Title.TextColor3, Title.Font, Title.TextSize, Title.TextXAlignment = "Yudha Hub | Gemini AI", Colors.Accent, Enum.Font.GothamBlack, 15, Enum.TextXAlignment.Left
+Title.Size, Title.Position, Title.BackgroundTransparency = UDim2.new(0, 250, 1, 0), UDim2.new(0, 15, 0, 0), 1
+Title.Text, Title.TextColor3, Title.Font, Title.TextSize, Title.TextXAlignment = "⚡ Yudha Hub | Gemini AI (V14)", Colors.Accent, Enum.Font.GothamBlack, 13, Enum.TextXAlignment.Left
 
-local SearchFake = Instance.new("Frame", TopBar)
-SearchFake.Size, SearchFake.Position, SearchFake.BackgroundColor3 = UDim2.new(0, 200, 0, 25), UDim2.new(0.5, -50, 0.5, -12), Colors.MainBg
-Instance.new("UICorner", SearchFake).CornerRadius = UDim.new(0, 6)
-Instance.new("UIStroke", SearchFake).Color = Colors.SectionBg
-local SearchTxt = Instance.new("TextLabel", SearchFake)
-SearchTxt.Size, SearchTxt.BackgroundTransparency, SearchTxt.Text, SearchTxt.TextColor3, SearchTxt.Font, SearchTxt.TextSize = UDim2.new(1, 0, 1, 0), 1, "🔍 Search...", Colors.TextDark, Enum.Font.Gotham, 11
+local OpenBtn = Instance.new("TextButton", SG)
+OpenBtn.Size, OpenBtn.Position, OpenBtn.BackgroundColor3, OpenBtn.Visible, OpenBtn.Active, OpenBtn.Draggable = UDim2.new(0, 120, 0, 40), UDim2.new(0.02, 0, 0.4, 0), Colors.SideBg, false, true, true
+OpenBtn.Text, OpenBtn.TextColor3, OpenBtn.Font, OpenBtn.TextSize = "⚡ Open Titan", Colors.Accent, Enum.Font.GothamBlack, 12
+Instance.new("UICorner", OpenBtn).CornerRadius = UDim.new(0, 8)
+Instance.new("UIStroke", OpenBtn).Color = Colors.Accent
 
 local MinBtn = Instance.new("TextButton", TopBar)
-MinBtn.Size, MinBtn.Position, MinBtn.BackgroundColor3, MinBtn.Text, MinBtn.TextColor3, MinBtn.Font, MinBtn.TextSize = UDim2.new(0, 30, 0, 30), UDim2.new(1, -45, 0.5, -15), Colors.MainBg, "-", Colors.TextMain, Enum.Font.GothamBold, 18
+MinBtn.Size, MinBtn.Position, MinBtn.BackgroundColor3, MinBtn.Text, MinBtn.TextColor3, MinBtn.Font, MinBtn.TextSize = UDim2.new(0, 30, 0, 30), UDim2.new(1, -40, 0.5, -15), Colors.MainBg, "-", Colors.TextMain, Enum.Font.GothamBold, 18
 Instance.new("UICorner", MinBtn).CornerRadius = UDim.new(0, 8)
 
--- SIDEBAR
-local Sidebar = Instance.new("Frame", Main)
-Sidebar.Size, Sidebar.Position, Sidebar.BackgroundColor3 = UDim2.new(0, 150, 1, -45), UDim2.new(0, 0, 0, 45), Colors.SideBg
-local SideLayout = Instance.new("UIListLayout", Sidebar)
-SideLayout.Padding, SideLayout.HorizontalAlignment = UDim.new(0, 8), Enum.HorizontalAlignment.Center
-Instance.new("UIPadding", Sidebar).PaddingTop = UDim.new(0, 15)
-
--- CONTENT AREA
-local ContentArea = Instance.new("Frame", Main)
-ContentArea.Size, ContentArea.Position, ContentArea.BackgroundTransparency = UDim2.new(1, -160, 1, -55), UDim2.new(0, 155, 0, 50), 1
+MinBtn.MouseButton1Click:Connect(function()
+    Main.Visible = false
+    OpenBtn.Visible = true
+end)
 -- ==========================================
--- BAGIAN 2: UI GENERATORS (Purple Aesthetics)
+-- BAGIAN 2: TABS, TOGGLES & SLIDERS
 -- ==========================================
 
 local Tabs = {}
@@ -104,7 +94,7 @@ local function CreateTab(name, icon)
     
     local Scroll = Instance.new("ScrollingFrame", ContentArea)
     Scroll.Size, Scroll.BackgroundTransparency, Scroll.ScrollBarThickness, Scroll.Visible = UDim2.new(1, 0, 1, 0), 1, 3, false
-    Scroll.CanvasSize = UDim2.new(0, 0, 0, 1000)
+    Scroll.CanvasSize = UDim2.new(0, 0, 0, 900)
     Scroll.ScrollBarImageColor3 = Colors.Accent
     local Layout = Instance.new("UIListLayout", Scroll)
     Layout.Padding, Layout.HorizontalAlignment = UDim.new(0, 10), Enum.HorizontalAlignment.Center
@@ -125,14 +115,6 @@ local function CreateTab(name, icon)
     return Scroll
 end
 
-local function AddSection(parent, title)
-    local Sec = Instance.new("Frame", parent)
-    Sec.Size, Sec.BackgroundColor3 = UDim2.new(0.95, 0, 0, 30), Colors.SideBg
-    Instance.new("UICorner", Sec).CornerRadius = UDim.new(0, 6)
-    local Txt = Instance.new("TextLabel", Sec)
-    Txt.Size, Txt.Position, Txt.BackgroundTransparency, Txt.Text, Txt.TextColor3, Txt.Font, Txt.TextSize, Txt.TextXAlignment = UDim2.new(1, -20, 1, 0), UDim2.new(0, 10, 0, 0), 1, title, Colors.Accent, Enum.Font.GothamBold, 12, Enum.TextXAlignment.Left
-end
-
 local function AddToggle(parent, txt, stateKey, cb)
     local btn = Instance.new("TextButton", parent)
     btn.Size, btn.BackgroundColor3, btn.Text = UDim2.new(0.95, 0, 0, 45), Colors.SectionBg, ""
@@ -144,7 +126,6 @@ local function AddToggle(parent, txt, stateKey, cb)
     local switchBg = Instance.new("Frame", btn)
     switchBg.Size, switchBg.Position, switchBg.BackgroundColor3 = UDim2.new(0, 42, 0, 22), UDim2.new(1, -55, 0.5, -11), State[stateKey] and Colors.Accent or Colors.MainBg
     Instance.new("UICorner", switchBg).CornerRadius = UDim.new(1, 0)
-    Instance.new("UIStroke", switchBg).Color = Colors.SideBg
     
     local switchDot = Instance.new("Frame", switchBg)
     switchDot.Size, switchDot.Position, switchDot.BackgroundColor3 = UDim2.new(0, 16, 0, 16), State[stateKey] and UDim2.new(1, -19, 0.5, -8) or UDim2.new(0, 3, 0.5, -8), Colors.TextMain
@@ -172,16 +153,16 @@ local function AddSlider(parent, txt, min, max, val, key, cb)
     Instance.new("UICorner", SliderBg).CornerRadius = UDim.new(1, 0)
     
     local SliderFill = Instance.new("Frame", SliderBg)
-    SliderFill.Size, SliderFill.BackgroundColor3 = UDim2.new((val-min)/(max-min), 0, 1, 0), Colors.Accent
+    SliderFill.Size, SliderFill.BackgroundColor3 = UDim2.new(math.clamp((val-min)/(max-min), 0, 1), 0, 1, 0), Colors.Accent
     Instance.new("UICorner", SliderFill).CornerRadius = UDim.new(1, 0)
     
     local dragging = false
-    SliderBg.InputBegan:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true end end)
-    UserInputService.InputEnded:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
+    SliderBg.MouseButton1Down:Connect(function() dragging = true end)
+    UserInputService.InputEnded:Connect(function(inp) if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
     
     UserInputService.InputChanged:Connect(function(inp)
-        if dragging and inp.UserInputType == Enum.UserInputType.MouseMovement then
-            local mousePos = UserInputService:GetMouseLocation().X
+        if dragging and (inp.UserInputType == Enum.UserInputType.MouseMovement or inp.UserInputType == Enum.UserInputType.Touch) then
+            local mousePos = inp.Position.X
             local rel = math.clamp((mousePos - SliderBg.AbsolutePosition.X) / SliderBg.AbsoluteSize.X, 0, 1)
             local newVal = math.floor(min + (max - min) * rel)
             SliderFill.Size = UDim2.new(rel, 0, 1, 0)
@@ -194,38 +175,37 @@ end
 
 local TabFarm = CreateTab("Farming", "⚔️")
 local TabMove = CreateTab("Movement", "🏃")
-local TabCombat = CreateTab("Player", "🛡️")
-local TabMisc = CreateTab("Settings", "⚙️")
 
 Tabs[1].Btn.BackgroundColor3 = Colors.Accent
 Tabs[1].Btn.TextColor3 = Colors.TextMain
 Tabs[1].Page.Visible = true
 
-AddSection(TabFarm, "Loot & Auto Farm")
-AddToggle(TabFarm, "Enable Auto Farm (Ori Logic)", "AutoFarm")
+AddToggle(TabFarm, "Auto Farm (ORI Stable)", "AutoFarm")
 AddSlider(TabFarm, "Farm Loop Delay", 1, 5, cfg.FarmDelay, "FarmDelay")
 AddToggle(TabFarm, "Aura Magnet Loot", "Magnet")
 AddSlider(TabFarm, "Magnet Radius", 10, 100, cfg.MagnetRadius, "MagnetRadius")
 
-AddSection(TabMove, "Mobility Options")
 AddToggle(TabMove, "Toggle Fly", "Fly")
 AddSlider(TabMove, "Fly Speed", 20, 200, cfg.FS, "FS")
 AddSlider(TabMove, "Walk Speed", 16, 200, cfg.WS, "WS")
 AddSlider(TabMove, "Jump Power", 50, 300, cfg.JP, "JP")
 AddToggle(TabMove, "Infinite Jump", "InfJ")
-AddToggle(TabMove, "Noclip (Walk through walls)", "Noclip")
 
-AddSection(TabCombat, "Player Mods")
-AddToggle(TabCombat, "God Mode (Invincible)", "GodMode")
-AddToggle(TabCombat, "Ghost Mode", "Invis")
-AddToggle(TabCombat, "Freeze Character", "Freeze")
-AddToggle(TabCombat, "Fullbright", "Fullbright")
-AddToggle(TabCombat, "ESP Outline", "ESP")
+OpenBtn.MouseButton1Click:Connect(function()
+    Main.Visible = true
+    OpenBtn.Visible = false
+end)
 
-AddSection(TabMisc, "System Settings")
-AddToggle(TabMisc, "Anti-AFK", "AntiAFK")
+local Sidebar = Instance.new("Frame", Main)
+Sidebar.Size, Sidebar.Position, Sidebar.BackgroundColor3 = UDim2.new(0, 150, 1, -45), UDim2.new(0, 0, 0, 45), Colors.SideBg
+local SideLayout = Instance.new("UIListLayout", Sidebar)
+SideLayout.Padding, SideLayout.HorizontalAlignment = UDim.new(0, 8), Enum.HorizontalAlignment.Center
+Instance.new("UIPadding", Sidebar).PaddingTop = UDim.new(0, 15)
+
+local ContentArea = Instance.new("Frame", Main)
+ContentArea.Size, ContentArea.Position, ContentArea.BackgroundTransparency = UDim2.new(1, -160, 1, -55), UDim2.new(0, 155, 0, 50), 1
 -- ==========================================
--- BAGIAN 3: TITAN ENGINE & ORIGINAL AUTOFARM
+-- BAGIAN 3: TITAN ENGINE & LOGIC
 -- ==========================================
 
 local currentCamera = Workspace.CurrentCamera
@@ -253,24 +233,13 @@ local function isPositionSafe(h, i)
     for k, l in ipairs(j:GetChildren()) do
         local m = getRoot(l)
         if m then
-            local n = (m.Position - h).Magnitude
-            if n <= i then return false end
+            if (m.Position - h).Magnitude <= i then return false end
         end
     end
     return true
 end
 
-local function fireProx(prompt)
-    pcall(function()
-        if prompt and prompt:IsA("ProximityPrompt") and prompt.Enabled then
-            prompt.HoldDuration = 0
-            prompt.MaxActivationDistance = 9e9
-            fireproximityprompt(prompt)
-        end
-    end)
-end
-
-RunService.Heartbeat:Connect(function(dt)
+RunService.Heartbeat:Connect(function()
     if not LP.Character then return end
     local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
     local hum = LP.Character:FindFirstChildWhichIsA("Humanoid")
@@ -292,37 +261,6 @@ RunService.Heartbeat:Connect(function(dt)
     end)
 end)
 
-RunService.Stepped:Connect(function()
-    local e = LP.Character
-    if not e then return end
-    
-    pcall(function()
-        if State.Noclip then
-            for h, i in ipairs(e:GetDescendants()) do
-                if i:IsA("BasePart") then i.CanCollide = false end
-            end
-        end
-        if State.GodMode then
-            local hum = e:FindFirstChildWhichIsA("Humanoid")
-            if hum then
-                hum.Health = hum.MaxHealth
-                hum:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
-            end
-        end
-    end)
-end)
-
-RunService.RenderStepped:Connect(function()
-    local e = LP.Character
-    if not e then return end
-    local f = e:FindFirstChild("HumanoidRootPart")
-    
-    if State.Freeze and f and f.Parent then
-        f.AssemblyLinearVelocity = Vector3.new(0,0,0)
-        f.AssemblyAngularVelocity = Vector3.new(0,0,0)
-    end
-end)
-
 UserInputService.JumpRequest:Connect(function()
     if State.InfJ and LP.Character then
         local hum = LP.Character:FindFirstChildWhichIsA("Humanoid")
@@ -330,20 +268,6 @@ UserInputService.JumpRequest:Connect(function()
     end
 end)
 
-task.spawn(function()
-    while task.wait(1.5) do
-        pcall(function()
-            if State.Fullbright then
-                Lighting.Brightness = 2
-                Lighting.ClockTime = 14
-                Lighting.GlobalShadows = false
-            end
-            if State.NoFog then Lighting.FogEnd = 100000 end
-        end)
-    end
-end)
-
--- ORI AUTO FARM & MAGNET (RESTORED & LINKED TO SLIDERS)
 task.spawn(function()
     while task.wait(0.5) do
         if State.AutoFarm then
@@ -443,7 +367,9 @@ task.spawn(function()
                                 if part and prompt and prompt.Enabled and (part.Position - originCF.Position).Magnitude <= cfg.MagnetRadius then
                                     f.CFrame = part.CFrame + Vector3.new(0, 1.5, 0)
                                     f.AssemblyLinearVelocity = Vector3.zero
-                                    fireProx(prompt)
+                                    prompt.HoldDuration = 0
+                                    prompt.MaxActivationDistance = 9e9
+                                    fireproximityprompt(prompt)
                                     collected = true
                                     task.wait(0.3)
                                 end
@@ -458,8 +384,4 @@ task.spawn(function()
             end
         end
     end
-end)
-
-LP.Idled:Connect(function()
-    if State.AntiAFK then pcall(function() game:GetService("VirtualUser"):ClickButton2(Vector2.new()) end) end
 end)
